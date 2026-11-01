@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OS Lab Code Vault | 1-Click Copy & Paste</title>
+  <meta name="description" content="Instant copy-paste repository for Operating System Lab codes, system calls, IPC, scheduling, and thread synchronization.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-tertiary: #1f2937;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(16, 185, 129, 0.4);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --code-bg: #090d16;
+      --header-bg: rgba(11, 15, 25, 0.85);
+      --line-num-color: #4b5563;
+      --badge-bg: rgba(31, 41, 55, 0.8);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
+      --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
+      --shadow-lg: 0 20px 35px -5px rgba(0,0,0,0.7);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --card-hover-border: rgba(16, 185, 129, 0.5);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --accent-emerald: #059669;
+      --accent-emerald-glow: rgba(5, 150, 105, 0.2);
+      --code-bg: #1e293b;
+      --header-bg: rgba(248, 250, 252, 0.9);
+      --line-num-color: #64748b;
+      --badge-bg: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 10px 20px rgba(0,0,0,0.05);
+      --shadow-lg: 0 20px 25px rgba(0,0,0,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0b0f19;
+      font-weight: 800;
+      font-size: 1.15rem;
+      box-shadow: 0 0 15px var(--accent-emerald-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      user-select: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent-emerald);
+      color: #042f21;
+      font-weight: 700;
+      box-shadow: 0 2px 8px var(--accent-emerald-glow);
+    }
+
+    .btn-primary:hover {
+      background: #34d399;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px var(--accent-emerald-glow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-main);
+      border-color: var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--card-hover-border);
+    }
+
+    .btn-copy {
+      background: #10b981;
+      color: #042b1e;
+      font-weight: 700;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      transition: var(--transition);
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-copy:hover {
+      background: #34d399;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-copy.copied {
+      background: #059669 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6) !important;
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+      border-color: var(--card-hover-border);
+      color: var(--accent-emerald);
+    }
+
+    /* Hero Search Bar */
+    .hero-section {
+      padding: 2.2rem 1.5rem 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #10b981, #06b6d4, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 750px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.95rem 3rem 0.95rem 3.1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 1rem;
+      font-family: inherit;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .search-kbd {
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+      pointer-events: none;
+    }
+
+    /* Filter Pills */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .filter-bar::-webkit-scrollbar-thumb {
+      background: var(--card-border);
+      border-radius: 4px;
+    }
+
+    .filter-pill {
+      white-space: nowrap;
+      padding: 0.45rem 0.9rem;
+      border-radius: 9999px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-pill:hover {
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-pill.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      font-weight: 600;
+    }
+
+    .filter-pill .pill-count {
+      font-size: 0.72rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Main Grid */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .code-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      .code-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Code Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      backdrop-filter: blur(8px);
+    }
+
+    .card:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem 0.85rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .card-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      background: var(--badge-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+    }
+
+    .tag-lang-c {
+      background: rgba(59, 130, 246, 0.12);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    .tag-lang-sh {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .card-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Sub-file tabs */
+    .file-tabs {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.4rem 1.25rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+
+    .file-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-family: 'Fira Code', monospace;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: var(--transition);
+    }
+
+    .file-tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-tab-btn.active {
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      font-weight: 600;
+    }
+
+    /* Code View Area */
+    .card-code-area {
+      position: relative;
+      background: var(--code-bg);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .code-action-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .strip-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pre-container {
+      position: relative;
+      max-height: 480px;
+      overflow: auto;
+      padding: 0.85rem 0;
+      scrollbar-width: thin;
+    }
+
+    .pre-container::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .pre-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    pre code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      display: block;
+      padding: 0 1rem;
+      color: #e2e8f0;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    /* Syntax Highlighting Tokens */
+    .token-keyword { color: #f472b6; font-weight: 600; }
+    .token-preprocessor { color: #c084fc; font-weight: 600; }
+    .token-type { color: #67e8f9; }
+    .token-string { color: #86efac; }
+    .token-comment { color: #64748b; font-style: italic; }
+    .token-number { color: #fde047; }
+    .token-func { color: #60a5fa; }
+    .token-operator { color: #cbd5e1; }
+
+    /* Card Footer */
+    .card-footer {
+      padding: 0.75rem 1.25rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .left-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Modal / Fullscreen Dialog */
+    dialog.code-modal {
+      width: 90vw;
+      max-width: 1100px;
+      max-height: 88vh;
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: var(--text-main);
+      box-shadow: var(--shadow-lg);
+      padding: 0;
+      margin: auto;
+      backdrop-filter: blur(20px);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-height: 88vh;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--code-bg);
+    }
+
+    .modal-body pre {
+      padding: 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #10b981;
+      color: #032b1e;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      pointer-events: auto;
+      animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.25s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+    }
+
+    /* Cheatsheet Modal */
+    .cheatsheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .cheatsheet-table th, .cheatsheet-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .cheatsheet-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .cheatsheet-table code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      color: #38bdf8;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      background: var(--header-bg);
+      margin-top: auto;
+    }
+
+    footer a {
+      color: var(--accent-emerald);
+      text-decoration: none;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(10px); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>OS Lab Vault <span class="brand-badge">Pure Codes</span></h1>
+      </div>
+    </a>
+
+    <div class="nav-actions">
+      <button class="btn btn-secondary" id="btn-cheatsheet" title="View Linux Commands Cheatsheet">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Commands</span>
+      </button>
+
+      <button class="btn btn-primary" id="btn-download-all" title="Download all codes as .zip">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Download All</span>
+      </button>
+
+      <button class="btn-icon" id="btn-theme-toggle" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+        <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section & Search -->
+  <section class="hero-section">
+    <div class="hero-header">
+      <h2 class="hero-title">Instant <span>Copy & Paste</span> OS Codes</h2>
+      <p class="hero-desc">All 11 Operating System Lab codes with clean syntax, bug fixes (corrected ligature typos), and 1-click copy for your practicals.</p>
+    </div>
+
+    <!-- Search input -->
+    <div class="search-wrapper">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="search-input" class="search-input" placeholder="Search by name, algorithm (e.g. Banker, SCAN, FIFO, fork), keyword, or code...">
+      <span class="search-kbd">Ctrl + K</span>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-pill active" data-category="all">
+        All Codes <span class="pill-count" id="count-all">11</span>
+      </button>
+      <button class="filter-pill" data-category="Deadlock">
+        Deadlock & Banker's <span class="pill-count">1</span>
+      </button>
+      <button class="filter-pill" data-category="Disk Scheduling">
+        Disk Scheduling <span class="pill-count">3</span>
+      </button>
+      <button class="filter-pill" data-category="IPC">
+        IPC (Pipes & FIFO) <span class="pill-count">2</span>
+      </button>
+      <button class="filter-pill" data-category="Process Control">
+        Process Control & Fork <span class="pill-count">2</span>
+      </button>
+      <button class="filter-pill" data-category="Synchronization">
+        Thread Synchronization <span class="pill-count">2</span>
+      </button>
+      <button class="filter-pill" data-category="Shell Scripting">
+        Shell Scripting <span class="pill-count">1</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Code Cards Grid -->
+  <main class="main-container">
+    <div class="stats-bar">
+      <span id="results-count">Showing 11 of 11 codes</span>
+      <span>Click <strong>Copy Code</strong> to copy directly to your clipboard</span>
+    </div>
+
+    <div class="code-grid" id="code-grid">
+      <!-- Cards rendered dynamically by JavaScript -->
+    </div>
+  </main>
+
+  <!-- Fullscreen Modal Dialog -->
+  <dialog class="code-modal" id="code-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="card-title-group">
+          <span class="card-num" id="modal-num">01</span>
+          <h3 class="card-title" id="modal-title">Code Title</h3>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-copy" id="modal-copy-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Code</span>
+          </button>
+          <button class="btn-icon" id="modal-close-btn" title="Close (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <pre><code id="modal-code"></code></pre>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Cheatsheet Modal Dialog -->
+  <dialog class="code-modal" id="cheatsheet-modal" style="max-width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="card-title">Linux OS Lab Commands Cheatsheet</h3>
+        <button class="btn-icon" id="cheatsheet-close-btn" title="Close (Esc)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div style="padding: 1.5rem; overflow-y: auto;">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Essential terminal commands for compiling, running, and managing your Operating Systems Lab experiments:</p>
+        
+        <table class="cheatsheet-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Command</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Compile standard C</td>
+              <td><code>gcc filename.c -o output</code></td>
+              <td>Creates executable named <code>output</code></td>
+            </tr>
+            <tr>
+              <td>Compile with Pthreads</td>
+              <td><code>gcc -pthread filename.c -o output</code></td>
+              <td>Required for Dining Philosophers & Semaphores</td>
+            </tr>
+            <tr>
+              <td>Run program</td>
+              <td><code>./output</code></td>
+              <td>Executes compiled binary in current folder</td>
+            </tr>
+            <tr>
+              <td>Run Shell Script</td>
+              <td><code>chmod +x script.sh && ./script.sh</code></td>
+              <td>Or run with <code>bash script.sh</code></td>
+            </tr>
+            <tr>
+              <td>Create Named Pipe</td>
+              <td><code>mkfifo myfifo</code></td>
+              <td>Creates a FIFO special file</td>
+            </tr>
+            <tr>
+              <td>List active processes</td>
+              <td><code>ps -ef | grep filename</code></td>
+              <td>Shows process IDs (PIDs)</td>
+            </tr>
+            <tr>
+              <td>Kill stuck process</td>
+              <td><code>kill -9 &lt;PID&gt;</code></td>
+              <td>Force kill any hanging thread or fork process</td>
+            </tr>
+            <tr>
+              <td>Clean FIFO files</td>
+              <td><code>rm -f fifo*.txt</code></td>
+              <td>Removes old FIFO pipes if program halted</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Operating System Laboratory Code Repository &bull; Designed for rapid access & seamless copy-paste.</p>
+    <p style="margin-top: 0.35rem; font-size: 0.78rem;">Pure codes &bull; No output clutter &bull; Pre-tested with GCC & Bash</p>
+  </footer>
+
+  <!-- Embedded JSZip for 100% offline zip generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- Application Logic & Dataset -->
+  <script src="app.js"></script>
+</body>
+</html>
